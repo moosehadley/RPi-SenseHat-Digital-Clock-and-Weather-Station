@@ -25,6 +25,9 @@ weathre = weather['weather'][0]['description']
 temp = weather['main']['temp']
 main_weather = weather['weather'][0]['main']
 
+update_weather_delay = 50   # Delay between updating the weather data
+update_weather = update_weather_delay
+
 # Display Clock, Date, etc.
 show_clock = True
 show_month = True
@@ -242,3 +245,14 @@ while (True):
         time.sleep(1.0)
         sense.show_message(str(temp), text_colour=[255, 0, 50])
         time.sleep(0.3)
+
+    if update_weather == 0:
+        url = requests.get('http://api.openweathermap.org/data/2.5/weather?id='+cityid+'&units='+units+'&APPID='+key)
+        weather = json.loads(url.text)
+        weathre = weather['weather'][0]['description']
+        temp = weather['main']['temp']
+        main_weather = weather['weather'][0]['main']
+        update_weather = update_weather_delay
+        print("- Weather updated successfully -")
+    else:
+        update_weather -=1
