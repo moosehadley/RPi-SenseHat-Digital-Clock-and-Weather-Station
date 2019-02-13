@@ -10,76 +10,69 @@ sense.set_rotation(270) # Optional
 sense.clear()
 
 # Get the weather-api
-key = 'your_api-key'
-units = 'metric'
-#units = 'imperial'
-cityid = 'your_cityid'
-url = requests.get('http://api.openweathermap.org/data/2.5/weather?id='+cityid+'&units='+units+'&APPID='+key)
-weather = json.loads(url.text)
-
-print (weather['main']['temp'])
-print (weather['weather'][0]['description'])
-print (weather['weather'][0]['main'])
-
-weathre = weather['weather'][0]['description']
-temp = weather['main']['temp']
-main_weather = weather['weather'][0]['main']
-
-update_weather_delay = 50   # Delay between updating the weather data
-update_weather = update_weather_delay
+key = 'Your Key Here'
+#units = 'metric'
+units = 'imperial'
+cityid = 'Your ID Here'
+#url = requests.get('http://api.openweathermap.org/data/2.5/weather?id='+cityid+'&units='+units+'&APPID='+key)
+#weather = json.loads(url.text)
 
 # Display Clock, Date, etc.
 show_clock = True
-show_month = True
+show_month = False
 show_temp = True
 show_weathre = True
 show_mail = False
 
 number = [
-0,1,1,1, #zero
-0,1,0,1,
+0,0,0,0, #zero
+0,1,1,1,
 0,1,0,1,
 0,1,1,1,
-0,0,1,0, #one
-0,1,1,0,
+0,1,1,0, #one
+0,0,1,0,
+0,0,1,0,
+0,0,1,0,
+0,1,1,0, #two
+0,0,0,1,
 0,0,1,0,
 0,1,1,1,
-0,1,1,1, #two
-0,0,1,1,
-0,1,1,0,
-0,1,1,1,
 0,1,1,1, #three
-0,0,1,1,
-0,0,1,1,
-0,1,1,1,
-0,1,0,1, #four
-0,1,1,1,
 0,0,0,1,
+0,0,1,1,
+0,1,1,1,
+0,0,0,1, #four
+0,1,0,1,
+0,1,1,1,
 0,0,0,1,
 0,1,1,1, #five
 0,1,1,0,
-0,0,1,1,
-0,1,1,1,
+0,0,0,1,
+0,1,1,0,
 0,1,0,0, #six
-0,1,1,1,
+0,1,1,0,
 0,1,0,1,
-0,1,1,1,
+0,0,1,0,
 0,1,1,1, #seven
 0,0,0,1,
 0,0,1,0,
-0,1,0,0,
-0,1,1,1, #eight
+0,0,1,0,
+0,0,1,0, #eight
 0,1,1,1,
 0,1,1,1,
-0,1,1,1,
-0,1,1,1, #nine
+0,0,1,0,
+0,0,1,0, #nine
 0,1,0,1,
-0,1,1,1,
-0,0,0,1
+0,0,1,1,
+0,0,0,1,
+0,0,0,0, #blank
+0,0,0,0,
+0,0,0,0,
+0,0,0,0
 ]
 
-hourColour   = [255,0,0] # red
-minuteColour = [255,128,0] # yellow
+hourColour   = [0,0,10] # blue
+minuteColour = [0,10,0] # green
 empty        = [0,0,0] # off / black
 
 clockImage = [
@@ -106,8 +99,8 @@ clear = [
     e,e,e,e,e,e,e,e
     ]
 
-b = (66, 134, 244)
-r = (255, 0, 50)
+b = (0, 0, 10)
+r = (10, 0, 10)
 
 cloudy = [
     e,e,e,e,e,e,e,e,
@@ -136,13 +129,17 @@ def clock():
     second = now.second
     x = 0
     y = 7
-    r = 255
-    g = 0
-    b = 0
+    r = 10
+    g = 10
+    b = 10
     pixel = (r,g,b)
 
     hour = time.localtime().tm_hour
     minute = time.localtime().tm_min
+    if(hour > 12):
+        hour = hour-12
+    if(hour == 0):
+        hour = 12
 
     # Map digits to clockImage array
 
@@ -152,6 +149,8 @@ def clock():
         for counterLoop in range(0, 4):
             if (hour >= 10):
                 clockImage[index] = number[int(hour/10)*16+pixelOffset]
+            else:
+                clockImage[index] = number[int(10)*16+pixelOffset]
             clockImage[index+4] = number[int(hour%10)*16+pixelOffset]
             clockImage[index+32] = number[int(minute/10)*16+pixelOffset]
             clockImage[index+36] = number[int(minute%10)*16+pixelOffset]
@@ -219,7 +218,7 @@ def month():
 
     # Display the time
     sense.set_pixels(clockImage)
-    time.sleep(4.0)
+    time.sleep(120)
 
 print ('Ready!')
 
@@ -234,25 +233,37 @@ while (True):
             if show_month:
                 month()
 
-    if show_weathre:
-        sense.set_pixels(cloudy)
-        time.sleep(1.0)
-        sense.show_message(str(weathre), text_colour=[66, 134, 244])
-        time.sleep(0.3)
+#    response = os.system("ping -c 1 api.openweathermap.org")
+#    if response == 0:
+#        print 'up'
+#        show_temp = True
+#        show_weathre = True
+#    else:
+#        print 'down'
+#        show_temp = False
+#        show_weathre = False
 
-    if show_temp:
-        sense.set_pixels(thermo)
-        time.sleep(1.0)
-        sense.show_message(str(temp), text_colour=[255, 0, 50])
-        time.sleep(0.3)
-
-    if update_weather == 0:
+    try:
         url = requests.get('http://api.openweathermap.org/data/2.5/weather?id='+cityid+'&units='+units+'&APPID='+key)
-        weather = json.loads(url.text)
-        weathre = weather['weather'][0]['description']
-        temp = weather['main']['temp']
-        main_weather = weather['weather'][0]['main']
-        update_weather = update_weather_delay
-        print("- Weather updated successfully -")
-    else:
-        update_weather -=1
+        show_temp = True
+        show_weathre = True
+   	if show_weathre:
+        	sense.set_pixels(cloudy)
+        	weather = json.loads(url.text)
+        	weathre = weather['weather'][0]['description']
+        	temp = weather['main']['temp']
+        	main_weather = weather['weather'][0]['main']
+        	sense.set_pixels(cloudy)
+        	time.sleep(1.0)
+        	sense.show_message(str(weathre), text_colour=[0, 0, 10])
+        	time.sleep(0.3)
+
+    	if show_temp:
+        	sense.set_pixels(thermo)
+        	time.sleep(1.0)
+		sense.show_message(str(temp), text_colour=[15, 0, 10])
+		time.sleep(0.3)
+    except:
+        show_temp = False
+        show_weathre = False
+        sense.show_message("no internet", text_colour=[10, 0, 0])
